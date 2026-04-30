@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Ghosted" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="/" class="navbar-brand">👻 Ghosted</a>
+      <%= link_to "New Application", new_job_application_path, class: "btn btn-primary" %>
+    </nav>
+
+    <div class="container">
+      <% if notice.present? %>
+        <div class="flash flash-notice" id="flash-notice">
+          <%= notice %>
+          <button class="flash-dismiss" onclick="document.getElementById('flash-notice').remove()" aria-label="Dismiss">&times;</button>
+        </div>
+      <% end %>
+      <%= yield %>
+    </div>
+  </body>
+</html>

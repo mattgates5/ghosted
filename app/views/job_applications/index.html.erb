@@ -1,0 +1,97 @@
+<% content_for :title, "Job Applications" %>
+
+<div class="page-header">
+  <h1>Job Applications <span class="count-badge"><%= @job_applications.count { |a| a.status != "Interested" } %></span></h1>
+  <%= link_to "Export CSV", job_applications_path(params.permit(:q, :status, :location, :location_type, :sort, :dir).merge(format: :csv)), class: "btn btn-secondary" %>
+</div>
+
+<% if @by_status.any? %>
+  <details class="charts-details" open>
+    <summary class="charts-summary">Charts</summary>
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>By Status</h3>
+        <% status_colors = { "Interested" => "#2dd4bf", "Applied" => "#60a5fa", "Phone Screen" => "#fbbf24", "Interview" => "#818cf8", "Offer" => "#34d399", "Rejected" => "#f87171", "Ghosted" => "#9ca3af", "Withdrawn" => "#c084fc" } %>
+        <%= pie_chart @by_status, donut: true, height: "220px", colors: @by_status.map { |s, _| status_colors[s] } %>
+      </div>
+      <div class="chart-card">
+        <h3>Applications Over Time</h3>
+        <%= line_chart @by_day, height: "220px", colors: ["#4f8ef7"] %>
+      </div>
+    </div>
+  </details>
+<% end %>
+
+<div class="filter-bar">
+  <%= form_with url: job_applications_path, method: :get do |f| %>
+    <%= f.text_field :q, value: params[:q], placeholder: "Search company, title, notes, tags…", class: "search-input" %>
+    <%= f.select :status, [["All Statuses", ""]] + JobApplication::STATUSES, { selected: params[:status] }, class: "filter-select" %>
+    <%= f.select :location, [["All Locations", ""]] + JobApplication::LOCATIONS, { selected: params[:location] }, class: "filter-select" %>
+    <%= f.select :location_type, [["All Types", ""]] + JobApplication::LOCATION_TYPES, { selected: params[:location_type] }, class: "filter-select" %>
+    <%= f.hidden_field :sort, value: @sort %>
+    <%= f.hidden_field :dir, value: @dir %>
+    <%= f.submit "Filter", class: "btn btn-secondary" %>
+    <% if params.slice(:q, :status, :location, :location_type).values.any?(&:present?) %>
+      <%= link_to "Clear", job_applications_path, class: "btn btn-ghost" %>
+    <% end %>
+  <% end %>
+</div>
+
+<% if @job_applications.empty? %>
+  <div class="empty-state">
+    <p>No applications yet. <%= link_to "Add your first one", new_job_application_path %>.</p>
+  </div>
+<% else %>
+  <div class="table-wrapper">
+    <table class="apps-table">
+      <thead>
+        <tr>
+          <%= sortable_header "Company", "company", @sort, @dir, params %>
+          <%= sortable_header "Title", "title", @sort, @dir, params %>
+          <%= sortable_header "Applied", "applied_on", @sort, @dir, params %>
+          <%= sortable_header "Closed", "closed_on", @sort, @dir, params %>
+          <%= sortable_header "Location", "location", @sort, @dir, params %>
+          <%= sortable_header "Type", "location_type", @sort, @dir, params %>
+          <%= sortable_header "Status", "status", @sort, @dir, params %>
+          <th>Tags</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @job_applications.each do |app| %>
+          <tr class="status-row-<%= app.status.downcase.gsub(/\s+/, '-') %>">
+            <td class="company-cell">
+              <% if app.url.present? %>
+                <%= link_to app.company, app.url, target: "_blank", rel: "noopener", class: "company-link" %>
+              <% else %>
+                <%= app.company %>
+              <% end %>
+            </td>
+            <td><%= app.url.present? ? link_to(app.title, app.url, target: "_blank", rel: "noopener") : app.title %></td>
+            <td class="date-cell"><%= app.applied_on&.strftime("%b %d, %Y") %></td>
+            <td class="date-cell"><%= app.closed_on&.strftime("%b %d, %Y") %></td>
+            <td><%= app.location %></td>
+            <td><%= app.location_type %></td>
+            <td><span class="status-badge status-<%= app.status.downcase.gsub(/\s+/, '-') %>"><%= app.status %></span></td>
+            <td class="tags-cell">
+              <% app.tag_list.each do |tag| %>
+                <span class="tag"><%= tag %></span>
+              <% end %>
+            </td>
+            <td class="actions-cell">
+              <%= link_to "Edit", edit_job_application_path(app), class: "btn btn-sm" %>
+              <%= button_to "Delete", job_application_path(app), method: :delete,
+                    class: "btn btn-sm btn-danger",
+                    form: { data: { turbo_confirm: "Delete application to #{app.company}?" } } %>
+            </td>
+          </tr>
+          <% if app.notes.present? %>
+            <tr class="notes-row">
+              <td colspan="8" class="notes-cell"><span class="notes-label">Notes:</span> <%= app.notes %></td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

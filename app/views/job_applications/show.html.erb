@@ -1,0 +1,37 @@
+<% content_for :title, @job_application.company %>
+
+<div class="page-header">
+  <h1><%= @job_application.company %></h1>
+  <div class="header-actions">
+    <%= link_to "Edit", edit_job_application_path(@job_application), class: "btn btn-secondary" %>
+    <%= button_to "Delete", job_application_path(@job_application), method: :delete,
+          class: "btn btn-danger",
+          form: { data: { turbo_confirm: "Delete this application?" } } %>
+  </div>
+</div>
+
+<div class="show-card">
+  <dl class="detail-list">
+    <dt>Job Title</dt><dd><%= @job_application.title %></dd>
+    <dt>Status</dt><dd><span class="status-badge status-<%= @job_application.status.downcase.gsub(/\s+/, '-') %>"><%= @job_application.status %></span></dd>
+    <dt>Applied On</dt><dd><%= @job_application.applied_on&.strftime("%B %d, %Y") %></dd>
+    <dt>Location</dt><dd><%= @job_application.location %></dd>
+    <dt>Work Type</dt><dd><%= @job_application.location_type %></dd>
+    <% if @job_application.url.present? %>
+      <dt>Posting</dt><dd><%= link_to @job_application.url, @job_application.url, target: "_blank", rel: "noopener" %></dd>
+    <% end %>
+    <% if @job_application.tag_list.any? %>
+      <dt>Tags</dt>
+      <dd>
+        <% @job_application.tag_list.each do |tag| %>
+          <span class="tag"><%= tag %></span>
+        <% end %>
+      </dd>
+    <% end %>
+    <% if @job_application.notes.present? %>
+      <dt>Notes</dt><dd class="notes-text"><%= simple_format @job_application.notes %></dd>
+    <% end %>
+  </dl>
+</div>
+
+<%= link_to "Back to all applications", job_applications_path, class: "btn btn-ghost" %>

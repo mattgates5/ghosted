@@ -1,0 +1,90 @@
+<%= form_with model: job_application, class: "app-form" do |f| %>
+  <% if job_application.errors.any? %>
+    <div class="form-errors">
+      <ul>
+        <% job_application.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-row">
+    <div class="form-group">
+      <%= f.label :company, "Company *" %>
+      <%= f.text_field :company, class: "form-control", placeholder: "Acme Corp" %>
+    </div>
+    <div class="form-group">
+      <%= f.label :title, "Job Title *" %>
+      <%= f.text_field :title, class: "form-control", placeholder: "Software Engineer" %>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <%= f.label :applied_on, "Date Applied" %>
+      <%= f.date_field :applied_on, class: "form-control" %>
+      <label class="checkbox-label">
+        <%= check_box_tag :clear_applied_on, "1", false, id: "clear_applied_on" %>
+        Leave date blank
+      </label>
+    </div>
+    <div class="form-group">
+      <%= f.label :status, "Status" %>
+      <%= f.select :status, JobApplication::STATUSES, {}, class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="form-row closed-date-row" style="<%= 'display:none' unless %w[Rejected Withdrawn Ghosted].include?(job_application.status) %>">
+    <div class="form-group">
+      <%= f.label :closed_on, "Closed Date" %>
+      <%= f.date_field :closed_on, class: "form-control" %>
+      <span class="field-hint">When you were rejected, withdrew, or stopped hearing back</span>
+    </div>
+    <div class="form-group"></div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <%= f.label :location, "Location" %>
+      <%= f.select :location, [["", ""]] + JobApplication::LOCATIONS, { include_blank: "Select location…" }, class: "form-control" %>
+    </div>
+    <div class="form-group">
+      <%= f.label :location_type, "Work Type" %>
+      <%= f.select :location_type, [["", ""]] + JobApplication::LOCATION_TYPES, { include_blank: "Select type…" }, class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :url, "Job Posting URL" %>
+    <%= f.url_field :url, class: "form-control", placeholder: "https://…" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :tags, "Tags (comma-separated)" %>
+    <%= f.text_field :tags, class: "form-control", placeholder: "startup, fintech, series-b" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :notes, "Notes / Comments" %>
+    <%= f.text_area :notes, class: "form-control", rows: 4, placeholder: "Recruiter name, interview notes, referral info…" %>
+  </div>
+
+  <script>
+    (function() {
+      var closed = ["Rejected", "Withdrawn", "Ghosted"];
+      var statusSel = document.querySelector("select[name*='status']");
+      var row = document.querySelector(".closed-date-row");
+      if (statusSel && row) {
+        statusSel.addEventListener("change", function() {
+          row.style.display = closed.includes(this.value) ? "" : "none";
+        });
+      }
+    })();
+  </script>
+
+  <div class="form-actions">
+    <%= f.submit class: "btn btn-primary" %>
+    <%= link_to "Cancel", job_applications_path, class: "btn btn-ghost" %>
+  </div>
+<% end %>

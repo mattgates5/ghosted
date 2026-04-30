@@ -1,0 +1,7 @@
+<% content_for :title, "Edit – #{@job_application.company}" %>
+
+<div class="page-header">
+  <h1>Edit: <%= @job_application.company %> — <%= @job_application.title %></h1>
+</div>
+
+<%= render "form", job_application: @job_application %>
