@@ -70,6 +70,11 @@
     <%= f.text_area :notes, class: "form-control", rows: 4, placeholder: "Recruiter name, interview notes, referral info…" %>
   </div>
 
+  <div class="form-group">
+    <%= f.label :job_description, "Job Description" %>
+    <%= f.text_area :job_description, class: "form-control", rows: 12, placeholder: "Paste the job description here…" %>
+  </div>
+
   <script>
     (function() {
       var closed = ["Rejected", "Withdrawn", "Ghosted"];
@@ -82,6 +87,16 @@
       }
     })();
   </script>
+
+  <% if job_application.persisted? %>
+    <div class="form-group form-group--archived">
+      <label class="checkbox-label checkbox-label--archived">
+        <%= f.check_box :archived %>
+        Archive this application
+      </label>
+      <span class="field-hint">Archived applications are hidden from All and Active views</span>
+    </div>
+  <% end %>
 
   <div class="form-actions">
     <%= f.submit class: "btn btn-primary" %>

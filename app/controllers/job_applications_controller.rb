@@ -2,46 +2,26 @@ class JobApplicationsController < ApplicationController
   before_action :set_job_application, only: %i[show edit update destroy]
 
   SORT_COLUMNS = %w[company title applied_on closed_on location location_type status].freeze
+  INACTIVE_STATUSES = %w[Rejected Ghosted Withdrawn].freeze
 
   def index
-    @job_applications = JobApplication.all
+    @current_view = :all
+    @job_applications = build_scope(JobApplication.all)
+    respond_with_formats(JobApplication.all)
+  end
 
-    if params[:status].present?
-      @job_applications = @job_applications.where(status: params[:status])
-    end
+  def active
+    @current_view = :active
+    base = JobApplication.where(archived: false).where.not(status: INACTIVE_STATUSES)
+    @job_applications = build_scope(base)
+    respond_with_formats(base)
+  end
 
-    if params[:location].present?
-      @job_applications = @job_applications.where(location: params[:location])
-    end
-
-    if params[:location_type].present?
-      @job_applications = @job_applications.where(location_type: params[:location_type])
-    end
-
-    if params[:q].present?
-      q = "%#{params[:q]}%"
-      @job_applications = @job_applications.where(
-        "company LIKE ? OR title LIKE ? OR notes LIKE ? OR tags LIKE ?", q, q, q, q
-      )
-    end
-
-    sort_col = SORT_COLUMNS.include?(params[:sort]) ? params[:sort] : "applied_on"
-    sort_dir = params[:dir] == "asc" ? "asc" : "desc"
-    @job_applications = @job_applications.order("#{sort_col} #{sort_dir}")
-
-    @sort = sort_col
-    @dir = sort_dir
-
-    respond_to do |format|
-      format.html do
-        counts = JobApplication.group(:status).count
-        @by_status = JobApplication::STATUSES.filter_map { |s| [s, counts[s]] if counts[s] }
-        @by_day = JobApplication.where.not(status: "Interested").group_by_day(:applied_on).count
-      end
-      format.csv do
-        send_data JobApplication.to_csv(@job_applications), filename: "job_applications_#{Date.today}.csv"
-      end
-    end
+  def archived
+    @current_view = :archived
+    base = JobApplication.where(archived: true)
+    @job_applications = build_scope(base)
+    respond_with_formats(base)
   end
 
   def show
@@ -85,10 +65,44 @@ class JobApplicationsController < ApplicationController
     @job_application = JobApplication.find(params[:id])
   end
 
+  def build_scope(base)
+    scope = base
+
+    scope = scope.where(status: params[:status]) if params[:status].present?
+    scope = scope.where(location: params[:location]) if params[:location].present?
+    scope = scope.where(location_type: params[:location_type]) if params[:location_type].present?
+
+    if params[:q].present?
+      q = "%#{params[:q]}%"
+      scope = scope.where("company LIKE ? OR title LIKE ? OR notes LIKE ? OR tags LIKE ?", q, q, q, q)
+    end
+
+    sort_col = SORT_COLUMNS.include?(params[:sort]) ? params[:sort] : "applied_on"
+    sort_dir = params[:dir] == "asc" ? "asc" : "desc"
+    @sort = sort_col
+    @dir = sort_dir
+
+    scope.order("#{sort_col} #{sort_dir}")
+  end
+
+  def respond_with_formats(chart_base)
+    respond_to do |format|
+      format.html do
+        counts = chart_base.group(:status).count
+        @by_status = JobApplication::STATUSES.filter_map { |s| [s, counts[s]] if counts[s] }
+        @by_day = chart_base.where.not(status: "Interested").group_by_day(:applied_on).count
+        render :index
+      end
+      format.csv do
+        send_data JobApplication.to_csv(@job_applications), filename: "job_applications_#{Date.today}.csv"
+      end
+    end
+  end
+
   def job_application_params
     params.require(:job_application).permit(
       :company, :title, :applied_on, :location, :location_type,
-      :status, :url, :notes, :tags, :closed_on
+      :status, :url, :notes, :tags, :closed_on, :job_description, :archived
     )
   end
 end

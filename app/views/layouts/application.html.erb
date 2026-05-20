@@ -11,6 +11,11 @@
   <body>
     <nav class="navbar">
       <a href="/" class="navbar-brand">👻 Ghosted</a>
+      <div class="nav-tabs">
+        <%= link_to "All", job_applications_path, class: "nav-tab #{'nav-tab--active' if controller.action_name == 'index'}" %>
+        <%= link_to "Active", active_job_applications_path, class: "nav-tab #{'nav-tab--active' if controller.action_name == 'active'}" %>
+        <%= link_to "Archived", archived_job_applications_path, class: "nav-tab #{'nav-tab--active' if controller.action_name == 'archived'}" %>
+      </div>
       <%= link_to "New Application", new_job_application_path, class: "btn btn-primary" %>
     </nav>
 

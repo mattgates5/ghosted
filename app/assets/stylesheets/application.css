@@ -45,6 +45,25 @@ a:hover { color: var(--accent-hover); text-decoration: underline; }
 }
 .navbar-brand:hover { text-decoration: none; color: var(--accent); }
 
+/* Nav tabs */
+.nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+}
+.nav-tab {
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+}
+.nav-tab:hover { color: var(--text); background: var(--surface2); text-decoration: none; }
+.nav-tab--active { color: var(--accent); background: rgba(79, 142, 247, 0.1); }
+
 /* Container */
 .container {
   width: 100%;
@@ -217,6 +236,7 @@ details:not([open]) .charts-summary::before { content: "▸"; }
 .apps-table td { padding: 10px 14px; vertical-align: middle; }
 
 .company-cell { font-weight: 600; }
+.archived-icon { font-size: 12px; margin-left: 6px; opacity: 0.5; cursor: default; vertical-align: middle; }
 .company-link { color: var(--text); }
 .company-link:hover { color: var(--accent); }
 .date-cell { white-space: nowrap; color: var(--text-muted); }
@@ -225,6 +245,11 @@ details:not([open]) .charts-summary::before { content: "▸"; }
 .notes-row:hover { background: var(--surface) !important; }
 .notes-cell { padding: 6px 14px 10px 32px !important; color: var(--text-muted); font-size: 12px; }
 .notes-label { font-weight: 600; color: var(--text-muted); margin-right: 6px; }
+
+.jd-cell { text-align: center; }
+.jd-icon { font-size: 14px; cursor: default; }
+.jd-icon--present { opacity: 1; }
+.jd-icon--absent { opacity: 0.2; filter: grayscale(1); }
 
 .actions-cell { white-space: nowrap; display: flex; gap: 6px; align-items: center; }
 .actions-cell form { display: inline; }
@@ -302,6 +327,8 @@ details:not([open]) .charts-summary::before { content: "▸"; }
 textarea.form-control { resize: vertical; }
 .checkbox-label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); margin-top: 6px; cursor: pointer; text-transform: none; letter-spacing: 0; font-weight: normal; }
 .field-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.form-group--archived { border-top: 1px solid var(--border); padding-top: 16px; margin-top: 8px; }
+.checkbox-label--archived { font-size: 13px; color: var(--text); margin-top: 0; }
 .form-actions { display: flex; gap: 10px; margin-top: 20px; }
 .form-errors {
   background: #2d1a1a;
@@ -337,6 +364,23 @@ textarea.form-control { resize: vertical; }
 }
 .detail-list dd { margin: 0; }
 .notes-text p { margin: 0 0 8px; }
+
+/* Job description */
+.section-heading {
+  margin: 0 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.job-description-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+.job-description-text p { margin: 0 0 10px; }
 
 /* Responsive */
 @media (max-width: 768px) {

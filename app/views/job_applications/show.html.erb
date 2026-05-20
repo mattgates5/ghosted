@@ -34,4 +34,11 @@
   </dl>
 </div>
 
+<% if @job_application.job_description.present? %>
+  <div class="show-card">
+    <h2 class="section-heading">Job Description</h2>
+    <div class="job-description-text"><%= simple_format @job_application.job_description %></div>
+  </div>
+<% end %>
+
 <%= link_to "Back to all applications", job_applications_path, class: "btn btn-ghost" %>

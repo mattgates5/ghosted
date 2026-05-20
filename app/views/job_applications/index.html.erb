@@ -1,8 +1,9 @@
-<% content_for :title, "Job Applications" %>
+<% view_label = { all: "All Applications", active: "Active Applications", archived: "Archived Applications" }[@current_view] %>
+<% content_for :title, view_label %>
 
 <div class="page-header">
-  <h1>Job Applications <span class="count-badge"><%= @job_applications.count { |a| a.status != "Interested" } %></span></h1>
-  <%= link_to "Export CSV", job_applications_path(params.permit(:q, :status, :location, :location_type, :sort, :dir).merge(format: :csv)), class: "btn btn-secondary" %>
+  <h1><%= view_label %> <span class="count-badge"><%= @job_applications.count { |a| a.status != "Interested" } %></span></h1>
+  <%= link_to "Export CSV", url_for(params.permit(:q, :status, :location, :location_type, :sort, :dir).merge(format: :csv)), class: "btn btn-secondary" %>
 </div>
 
 <% if @by_status.any? %>
@@ -54,6 +55,7 @@
           <%= sortable_header "Type", "location_type", @sort, @dir, params %>
           <%= sortable_header "Status", "status", @sort, @dir, params %>
           <th>Tags</th>
+          <th title="Job description">JD</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -65,6 +67,9 @@
                 <%= link_to app.company, app.url, target: "_blank", rel: "noopener", class: "company-link" %>
               <% else %>
                 <%= app.company %>
+              <% end %>
+              <% if app.archived? %>
+                <span class="archived-icon" title="Archived">&#x1F5C3;</span>
               <% end %>
             </td>
             <td><%= app.url.present? ? link_to(app.title, app.url, target: "_blank", rel: "noopener") : app.title %></td>
@@ -78,6 +83,13 @@
                 <span class="tag"><%= tag %></span>
               <% end %>
             </td>
+            <td class="jd-cell">
+              <% if app.job_description.present? %>
+                <span title="Job description added" class="jd-icon jd-icon--present">&#x1F4C4;</span>
+              <% else %>
+                <span title="No job description" class="jd-icon jd-icon--absent">&#x1F4C4;</span>
+              <% end %>
+            </td>
             <td class="actions-cell">
               <%= link_to "Edit", edit_job_application_path(app), class: "btn btn-sm" %>
               <%= button_to "Delete", job_application_path(app), method: :delete,
@@ -87,7 +99,7 @@
           </tr>
           <% if app.notes.present? %>
             <tr class="notes-row">
-              <td colspan="8" class="notes-cell"><span class="notes-label">Notes:</span> <%= app.notes %></td>
+              <td colspan="9" class="notes-cell"><span class="notes-label">Notes:</span> <%= app.notes %></td>
             </tr>
           <% end %>
         <% end %>

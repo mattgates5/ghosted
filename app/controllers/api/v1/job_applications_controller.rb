@@ -1,7 +1,7 @@
 module Api
   module V1
     class JobApplicationsController < BaseController
-      before_action :set_job_application, only: %i[show update destroy]
+      before_action :set_job_application, only: %i[show update destroy job_description]
 
       def index
         apps = JobApplication.all
@@ -41,6 +41,13 @@ module Api
         head :no_content
       end
 
+      def job_description
+        render json: {
+          id: @job_application.id,
+          job_description: @job_application.job_description
+        }
+      end
+
       private
 
       def set_job_application
@@ -52,7 +59,7 @@ module Api
       def job_application_params
         params.require(:job_application).permit(
           :company, :title, :applied_on, :closed_on,
-          :location, :location_type, :status, :url, :notes, :tags
+          :location, :location_type, :status, :url, :notes, :tags, :job_description
         )
       end
     end
