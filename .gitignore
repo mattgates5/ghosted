@@ -29,7 +29,13 @@
 !/tmp/storage/.keep
 
 /public/assets
+/public/packs
 
 # Ignore key files for decrypting credentials and more.
 /config/*.key
+/config/credentials.yml.enc
+
+# Ignore JS dependencies and debugger history.
+/node_modules
+.byebug_history
 
