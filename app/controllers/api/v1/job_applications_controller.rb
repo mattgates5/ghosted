@@ -4,15 +4,7 @@ module Api
       before_action :set_job_application, only: %i[show update destroy job_description]
 
       def index
-        apps = JobApplication.all
-        apps = apps.where(status: params[:status]) if params[:status].present?
-        apps = apps.where(location: params[:location]) if params[:location].present?
-        apps = apps.where(location_type: params[:location_type]) if params[:location_type].present?
-        if params[:q].present?
-          q = "%#{params[:q]}%"
-          apps = apps.where("company LIKE ? OR title LIKE ? OR notes LIKE ? OR tags LIKE ?", q, q, q, q)
-        end
-        render json: apps
+        render json: JobApplication.with_filters(params)
       end
 
       def show

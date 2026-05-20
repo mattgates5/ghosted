@@ -10,7 +10,7 @@ module JobApplicationsHelper
 
     url = job_applications_path(params.permit(:q, :status, :location, :location_type).merge(sort: column, dir: new_dir))
     content_tag(:th, class: "sortable #{"sorted" if current_sort == column}") do
-      link_to "#{label}#{indicator}".html_safe, url
+      link_to "#{label}#{indicator}", url
     end
   end
 end

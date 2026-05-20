@@ -20,6 +20,18 @@ class JobApplication < ApplicationRecord
     end
   end
 
+  def self.with_filters(params)
+    scope = all
+    scope = scope.where(status: params[:status]) if params[:status].present?
+    scope = scope.where(location: params[:location]) if params[:location].present?
+    scope = scope.where(location_type: params[:location_type]) if params[:location_type].present?
+    if params[:q].present?
+      q = "%#{params[:q]}%"
+      scope = scope.where("company LIKE ? OR title LIKE ? OR notes LIKE ? OR tags LIKE ?", q, q, q, q)
+    end
+    scope
+  end
+
   validates :company, presence: true
   validates :title, presence: true
   validates :status, inclusion: { in: STATUSES }
