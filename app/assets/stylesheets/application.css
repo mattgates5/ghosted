@@ -240,6 +240,8 @@ details:not([open]) .charts-summary::before { content: "▸"; }
 .company-link { color: var(--text); }
 .company-link:hover { color: var(--accent); }
 .date-cell { white-space: nowrap; color: var(--text-muted); }
+.age-cell { white-space: nowrap; color: var(--text-muted); font-size: 13px; }
+.age-stale { color: #f87171; }
 
 .notes-row { background: var(--surface) !important; }
 .notes-row:hover { background: var(--surface) !important; }
@@ -280,6 +282,8 @@ details:not([open]) .charts-summary::before { content: "▸"; }
 .status-applied        { background: #1a2f4a; color: #60a5fa; }
 .status-phone-screen   { background: #2d2a1a; color: #fbbf24; }
 .status-interview      { background: #1a2f4a; color: #818cf8; }
+.status-tech-screen    { background: #0f2d2d; color: #22d3ee; }
+.status-final          { background: #2d1f3a; color: #e879f9; }
 .status-offer          { background: #1a3327; color: #34d399; }
 .status-rejected       { background: #2d1a1a; color: #f87171; }
 .status-ghosted        { background: #1e1e2d; color: #9ca3af; }

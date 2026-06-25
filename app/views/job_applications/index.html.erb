@@ -12,8 +12,21 @@
     <div class="charts-row">
       <div class="chart-card">
         <h3>By Status</h3>
-        <% status_colors = { "Interested" => "#2dd4bf", "Applied" => "#60a5fa", "Phone Screen" => "#fbbf24", "Interview" => "#818cf8", "Offer" => "#34d399", "Rejected" => "#f87171", "Ghosted" => "#9ca3af", "Withdrawn" => "#c084fc" } %>
-        <%= pie_chart @by_status, donut: true, height: "220px", colors: @by_status.map { |s, _| status_colors[s] } %>
+        <% status_colors = { "Interested" => "#2dd4bf", "Applied" => "#60a5fa", "Phone Screen" => "#fbbf24", "Interview" => "#818cf8", "Tech Screen" => "#22d3ee", "Final" => "#e879f9", "Offer" => "#34d399", "Rejected" => "#f87171", "Ghosted" => "#9ca3af", "Withdrawn" => "#c084fc" } %>
+        <%= pie_chart @by_status, donut: true, height: "220px", colors: @by_status.map { |s, _| status_colors[s] }, id: "chart-by-status" %>
+        <script type="module">
+          import Chartkick from "chartkick"
+          window.addEventListener("chartkick:load", function() {
+            const chartObj = Chartkick.charts["chart-by-status"]?.getChartObject()
+            if (!chartObj) return
+            const total = chartObj.data.datasets[0].data.reduce((a, b) => a + b, 0)
+            chartObj.options.plugins.tooltip.callbacks.label = function(ctx) {
+              const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : "0.0"
+              return ` ${ctx.label}: ${ctx.parsed} (${pct}%)`
+            }
+            chartObj.update()
+          })
+        </script>
       </div>
       <div class="chart-card">
         <h3>Applications Over Time</h3>
@@ -54,6 +67,7 @@
           <%= sortable_header "Location", "location", @sort, @dir, params %>
           <%= sortable_header "Type", "location_type", @sort, @dir, params %>
           <%= sortable_header "Status", "status", @sort, @dir, params %>
+          <th>Age</th>
           <th>Tags</th>
           <th title="Job description">JD</th>
           <th>Actions</th>
@@ -78,6 +92,14 @@
             <td><%= app.location %></td>
             <td><%= app.location_type %></td>
             <td><span class="status-badge status-<%= app.status.downcase.gsub(/\s+/, '-') %>"><%= app.status %></span></td>
+            <% if app.applied_on %>
+              <% closed = %w[Rejected Ghosted Withdrawn].include?(app.status) %>
+              <% end_date = closed && app.closed_on ? app.closed_on : Date.today %>
+              <% age_days = (end_date - app.applied_on).to_i %>
+              <td class="age-cell<%= " age-stale" if !closed && age_days > 30 %>" title="<%= closed ? "Open for #{age_days} days" : "#{age_days} days since applied" %>"><%= age_days %>d</td>
+            <% else %>
+              <td class="age-cell"></td>
+            <% end %>
             <td class="tags-cell">
               <% app.tag_list.each do |tag| %>
                 <span class="tag"><%= tag %></span>
@@ -99,7 +121,7 @@
           </tr>
           <% if app.notes.present? %>
             <tr class="notes-row">
-              <td colspan="9" class="notes-cell"><span class="notes-label">Notes:</span> <%= app.notes %></td>
+              <td colspan="10" class="notes-cell"><span class="notes-label">Notes:</span> <%= app.notes %></td>
             </tr>
           <% end %>
         <% end %>

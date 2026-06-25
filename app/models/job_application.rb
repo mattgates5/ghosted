@@ -1,7 +1,7 @@
 class JobApplication < ApplicationRecord
   LOCATIONS = ["Remote", "SF Bay Area", "San Francisco", "Sacramento", "Other"].freeze
   LOCATION_TYPES = ["Remote", "Hybrid", "On-site"].freeze
-  STATUSES = ["Interested", "Applied", "Phone Screen", "Interview", "Offer", "Rejected", "Ghosted", "Withdrawn"].freeze
+  STATUSES = ["Interested", "Applied", "Phone Screen", "Interview", "Tech Screen", "Final", "Offer", "Rejected", "Ghosted", "Withdrawn"].freeze
 
   CSV_HEADERS = %w[Company Title Status URL Applied Closed Location Type Notes Tags].freeze
 
